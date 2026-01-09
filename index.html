@@ -184,6 +184,47 @@ target="_blank">💬</a>
 
   </form>
 </section>
+<script>
+const produto = document.getElementById("produto");
+const quantidade = document.getElementById("quantidade");
+const total = document.getElementById("total");
+
+function atualizarTotal() {
+  const valor = Number(produto.value);
+  const qtd = Number(quantidade.value);
+  total.innerText = "Total: R$ " + (valor * qtd).toFixed(2);
+}
+
+produto.addEventListener("change", atualizarTotal);
+quantidade.addEventListener("input", atualizarTotal);
+
+function finalizarPedido() {
+  const nome = document.getElementById("nome").value;
+  const endereco = document.getElementById("endereco").value;
+  const qtd = quantidade.value;
+  const valor = produto.value;
+  const textoProduto = produto.options[produto.selectedIndex].text;
+  const totalPedido = (valor * qtd).toFixed(2);
+
+  if (!nome || !endereco) {
+    alert("Preencha nome e endereço");
+    return;
+  }
+
+  const mensagem =
+    `Pedido pelo site:%0A` +
+    `Nome: ${nome}%0A` +
+    `Produto: ${textoProduto}%0A` +
+    `Quantidade: ${qtd}%0A` +
+    `Total: R$ ${totalPedido}%0A` +
+    `Endereço: ${endereco}`;
+
+  window.open(
+    "https://wa.me/5599984772668?text=" + mensagem,
+    "_blank"
+  );
+}
+</script>
 
 
 </body>
