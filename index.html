@@ -30,21 +30,12 @@ header h1{
   font-size:36px;
 }
 
-header p{
-  margin-top:10px;
-  font-size:18px;
-}
-
 section{
   max-width:900px;
   margin:30px auto;
   padding:25px;
   background:rgba(0,0,0,0.85);
   border-radius:10px;
-}
-
-h2{
-  color:#ff9800;
 }
 
 .item{
@@ -59,18 +50,14 @@ h2{
 
 .botao{
   display:block;
-  margin:25px auto 0;
-  text-align:center;
+  margin:15px auto;
   background:#ff9800;
   color:#000;
   padding:15px;
   border-radius:8px;
   font-weight:bold;
+  text-align:center;
   text-decoration:none;
-}
-
-.botao:hover{
-  background:#ffa726;
 }
 
 .whatsapp{
@@ -86,21 +73,6 @@ h2{
   line-height:60px;
   border-radius:50%;
   text-decoration:none;
-  box-shadow:0 4px 10px rgba(0,0,0,0.6);
-  z-index:999;
-}
-
-footer{
-  text-align:center;
-  padding:20px;
-  background:#000;
-  color:#aaa;
-  margin-top:40px;
-}
-
-@media(max-width:600px){
-  header h1{font-size:28px;}
-  .item{font-size:16px;}
 }
 </style>
 </head>
@@ -115,142 +87,84 @@ footer{
 <section>
 <h2>🍢 Cardápio</h2>
 
-<div class="item">
-  <span>Espetinho simples de Gado</span>
-  <strong>R$ 15,00</strong>
-</div>
+<div class="item"><span>Gado simples</span><strong>R$ 15,00</strong></div>
+<div class="item"><span>Gado completo</span><strong>R$ 20,00</strong></div>
+<div class="item"><span>Misto</span><strong>R$ 25,00</strong></div>
+</section>
 
-<div class="item">
-  <span>Espetinho de Gado Completo</span>
-  <strong>R$ 20,00</strong>
-</div>
+<section>
+<h2>📝 Fazer pedido</h2>
 
-<div class="item">
-  <span>Espetinho Misto</span>
-  <strong>R$ 25,00</strong>
-</div>
+<label>Nome:</label><br>
+<input id="nome"><br><br>
+
+<label>Produto:</label><br>
+<select id="produto">
+<option value="15">Gado simples - R$15</option>
+<option value="20">Gado completo - R$20</option>
+<option value="25">Misto - R$25</option>
+</select><br><br>
+
+<label>Quantidade:</label><br>
+<input type="number" id="quantidade" value="1"><br><br>
+
+<label>Endereço:</label><br>
+<textarea id="endereco"></textarea><br><br>
+
+<label>📍 Localização GPS:</label><br>
+<input id="localizacao" readonly placeholder="Clique no botão abaixo"><br><br>
+
+<button class="botao" onclick="pegarLocalizacao()">📍 Usar minha localização</button>
+
+<p id="total"><strong>Total: R$ 15,00</strong></p>
+
+<button class="botao" onclick="finalizarPedido()">Finalizar Pedido</button>
+</section>
+
+<section>
+<h2>📍 Onde estamos</h2>
+<iframe src="https://www.google.com/maps?q=Brasil&output=embed"
+width="100%" height="300" style="border:0;border-radius:10px;"></iframe>
 </section>
 
 <footer>
-<p>© 2026 - Espetinho Nota 10</p>
+<p style="text-align:center;">© 2026 - Espetinho Nota 10</p>
 </footer>
 
-<a class="whatsapp"
-href="https://wa.me/5599984772668"
-target="_blank">💬</a>
-<section>
-  <h2>📝 Fazer pedido pelo site</h2>
+<a class="whatsapp" href="https://wa.me/5599984772668" target="_blank">💬</a>
 
-  <form id="pedidoForm">
-
-    <label>👤 Nome:</label><br>
-    <input type="text" id="nome" required><br><br>
-
-    <label>🍢 Escolha o espetinho:</label><br>
-    <select id="produto">
-      <option value="15">Gado simples - R$15</option>
-      <option value="25">Completo Misto Gado e lingiça - R$25</option>
-      <option value="20">Completo Gado - R$20</option>
-    </select><br><br>
-
-    <label>🔢 Quantidade:</label><br>
-    <input type="number" id="quantidade" min="1" value="1"><br><br>
-
-    <label>📍 Endereço:</label><br>
-    <textarea id="endereco" required></textarea><br><br>
-
-    <p id="total" style="font-weight:bold; font-size:18px;">
-      Total: R$ 15,00
-    </p>
-
-    <button type="button" class="botao" onclick="finalizarPedido()">
-      Finalizar Pedido
-    </button>
-
-  </form>
-</section>
 <script>
 const produto = document.getElementById("produto");
 const quantidade = document.getElementById("quantidade");
 const total = document.getElementById("total");
 
-function atualizarTotal() {
-  const valor = Number(produto.value);
-  const qtd = Number(quantidade.value);
-  total.innerText = "Total: R$ " + (valor * qtd).toFixed(2);
+function atualizarTotal(){
+  total.innerText = "Total: R$ " + (produto.value * quantidade.value).toFixed(2);
+}
+produto.onchange = atualizarTotal;
+quantidade.oninput = atualizarTotal;
+
+function pegarLocalizacao(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const link = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
+    document.getElementById("localizacao").value = link;
+    alert("Localização capturada!");
+  });
 }
 
-produto.addEventListener("change", atualizarTotal);
-quantidade.addEventListener("input", atualizarTotal);
+function finalizarPedido(){
+  const msg =
+`🍢 PEDIDO
+Nome: ${nome.value}
+Produto: ${produto.options[produto.selectedIndex].text}
+Qtd: ${quantidade.value}
+Endereço: ${endereco.value}
+Localização: ${localizacao.value}
+Total: R$ ${(produto.value * quantidade.value).toFixed(2)}`;
 
-function finalizarPedido() {
-  const nome = document.getElementById("nome").value;
-  const endereco = document.getElementById("endereco").value;
-  const qtd = quantidade.value;
-  const valor = produto.value;
-  const textoProduto = produto.options[produto.selectedIndex].text;
-  const totalPedido = (valor * qtd).toFixed(2);
-
-  if (!nome || !endereco) {
-    alert("Preencha nome e endereço");
-    return;
-  }
-
-  const mensagem =
-    `Pedido pelo site:%0A` +
-    `Nome: ${nome}%0A` +
-    `Produto: ${textoProduto}%0A` +
-    `Quantidade: ${qtd}%0A` +
-    `Total: R$ ${totalPedido}%0A` +
-    `Endereço: ${endereco}`;
-
-  window.open(
-    "https://wa.me/5599984772668?text=" + mensagem,
-    "_blank"
-  );
-}
-</script>
-  <label>📍 Localização:</label><br>
-<input type="text" id="localizacao" placeholder="Clique para usar sua localização" readonly>
-<br><br>
-
-<button type="button" class="botao" onclick="pegarLocalizacao()">
-  📍 Usar minha localização
-</button>
-  <script>
-function pegarLocalizacao() {
-  if (!navigator.geolocation) {
-    alert("Geolocalização não é suportada neste navegador.");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    function (position) {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-
-      const linkMapa = `https://www.google.com/maps?q=${lat},${lon}`;
-
-      document.getElementById("localizacao").value = linkMapa;
-    },
-    function (const localizacao = document.getElementById("localizacao").value || "Não informada";
-) {
-      alert("`📍 Localização: ${localizacao}%0A` +
-");
-    }
-  );
+  window.open("https://wa.me/5599984772668?text="+encodeURIComponent(msg));
 }
 </script>
 
-
-
-<section>
-<h2>📍 Onde estamos</h2>
-<iframe 
-src="https://www.google.com/maps?q=Brasil&output=embed"
-width="100%" height="300"
-style="border:0; border-radius:10px;">
-</iframe>
-</section>
 </body>
 </html>
