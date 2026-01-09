@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espetinho Nota 10</title>
 
+<link rel="manifest" href="manifest.json">
+
 <style>
 body{
   margin:0;
@@ -16,30 +18,21 @@ body{
   background-size:cover;
   background-position:center;
 }
-
 header{
   text-align:center;
   padding:40px 20px;
   background:#000;
   border-bottom:4px solid #ff9800;
 }
-
-header h1{
-  margin:0;
-  color:#ff9800;
-  font-size:36px;
-}
-
-section, .card{
+header h1{margin:0;color:#ff9800;font-size:36px}
+section{
   max-width:900px;
   margin:30px auto;
   padding:25px;
   background:rgba(0,0,0,0.85);
   border-radius:10px;
 }
-
-h2,h3{color:#ff9800}
-
+h2{color:#ff9800}
 .item{
   display:flex;
   justify-content:space-between;
@@ -49,14 +42,12 @@ h2,h3{color:#ff9800}
   border-left:5px solid #ff9800;
   border-radius:8px;
 }
-
-input, textarea, select{
+input,textarea,select{
   width:100%;
   padding:10px;
   border-radius:6px;
   border:none;
 }
-
 .botao{
   display:block;
   margin:15px auto;
@@ -66,10 +57,8 @@ input, textarea, select{
   border-radius:8px;
   font-weight:bold;
   text-align:center;
-  text-decoration:none;
   cursor:pointer;
 }
-
 .whatsapp{
   position:fixed;
   bottom:20px;
@@ -84,44 +73,46 @@ input, textarea, select{
   border-radius:50%;
   text-decoration:none;
 }
+.card{
+  max-width:900px;
+  margin:30px auto;
+  padding:20px;
+  background:#111;
+  border-radius:10px;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Espetinho Nota 10</h1>
-  <p>Sabor de verdade na brasa 🔥</p>
+<h1>Espetinho Nota 10</h1>
+<p>Sabor de verdade na brasa 🔥</p>
 </header>
 
 <section>
 <h2>🍢 Cardápio</h2>
-<div class="item"><span>Gado simples</span><strong>R$ 15,00</strong></div>
-<div class="item"><span>Gado completo</span><strong>R$ 20,00</strong></div>
-<div class="item"><span>Misto</span><strong>R$ 25,00</strong></div>
+<div class="item"><span>Gado simples</span><strong>R$ 15</strong></div>
+<div class="item"><span>Gado completo</span><strong>R$ 20</strong></div>
+<div class="item"><span>Misto</span><strong>R$ 25</strong></div>
 </section>
 
 <section>
 <h2>📝 Fazer pedido</h2>
 
-<label>Nome:</label>
-<input id="nome">
+<input id="nome" placeholder="Nome">
 
-<label>Produto:</label>
 <select id="produto">
 <option value="15">Gado simples - R$15</option>
 <option value="20">Gado completo - R$20</option>
 <option value="25">Misto - R$25</option>
 </select>
 
-<label>Quantidade:</label>
 <input type="number" id="quantidade" value="1" min="1">
 
-<label>Endereço:</label>
-<textarea id="endereco"></textarea>
+<textarea id="endereco" placeholder="Endereço"></textarea>
 
-<label>📍 Localização GPS:</label>
-<input id="localizacao" readonly placeholder="Clique no botão abaixo">
+<input id="localizacao" readonly placeholder="Localização GPS">
 
 <button class="botao" onclick="pegarLocalizacao()">📍 Usar minha localização</button>
 
@@ -130,17 +121,19 @@ input, textarea, select{
 <button class="botao" onclick="finalizarPedido()">Finalizar Pedido</button>
 </section>
 
-<div class="card">
-  <h3>📜 Histórico de pedidos</h3>
-  <div id="historico"></div>
-  <button class="botao" onclick="limparHistorico()">🗑️ Limpar histórico</button>
-</div>
-
 <section>
-<h2>📍 Onde estamos</h2>
-<iframe src="https://www.google.com/maps?q=Brasil&output=embed"
-width="100%" height="300" style="border:0;border-radius:10px;"></iframe>
+<h2>💰 Pagamento PIX</h2>
+<p>📱 Chave Pix: <strong>55 99 98477-2668</strong></p>
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=PIX-5599984772668"
+style="display:block;margin:auto;border-radius:10px">
+<p style="text-align:center;">Após pagar, envie o comprovante</p>
 </section>
+
+<div class="card">
+<h2>📜 Histórico de pedidos</h2>
+<div id="historico"></div>
+<button class="botao" onclick="limparHistorico()">Limpar histórico</button>
+</div>
 
 <footer style="text-align:center;padding:20px;background:#000;">
 © 2026 - Espetinho Nota 10
@@ -149,68 +142,43 @@ width="100%" height="300" style="border:0;border-radius:10px;"></iframe>
 <a class="whatsapp" href="https://wa.me/5599984772668" target="_blank">💬</a>
 
 <script>
-const produto = document.getElementById("produto");
-const quantidade = document.getElementById("quantidade");
-const total = document.getElementById("total");
+const produto=document.getElementById("produto");
+const quantidade=document.getElementById("quantidade");
+const total=document.getElementById("total");
+let taxaEntrega=0;
 
-const LOJA_LAT = -5.5266;
-const LOJA_LON = -47.4821;
-let taxaEntrega = 0;
+const LOJA_LAT=-5.5266;
+const LOJA_LON=-47.4821;
 
 function atualizarTotal(){
-  const subtotal = produto.value * quantidade.value;
-  total.innerText =
-    `Total: R$ ${(subtotal + taxaEntrega).toFixed(2)} (Entrega: R$ ${taxaEntrega})`;
+  const sub=produto.value*quantidade.value;
+  total.innerText=`Total: R$ ${(sub+taxaEntrega).toFixed(2)}`;
 }
-
-produto.onchange = atualizarTotal;
-quantidade.oninput = atualizarTotal;
-
-function calcularDistancia(lat1, lon1, lat2, lon2){
-  const R = 6371;
-  const dLat = (lat2-lat1) * Math.PI/180;
-  const dLon = (lon2-lon1) * Math.PI/180;
-  const a =
-    Math.sin(dLat/2)**2 +
-    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
-    Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
+produto.onchange=atualizarTotal;
+quantidade.oninput=atualizarTotal;
 
 function pegarLocalizacao(){
   navigator.geolocation.getCurrentPosition(pos=>{
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-
-    const dist = calcularDistancia(LOJA_LAT, LOJA_LON, lat, lon);
-
-    taxaEntrega = dist <= 2 ? 3 : dist <= 5 ? 5 : 8;
-
-    document.getElementById("localizacao").value =
+    const lat=pos.coords.latitude;
+    const lon=pos.coords.longitude;
+    document.getElementById("localizacao").value=
       `https://www.google.com/maps?q=${lat},${lon}`;
-
     atualizarTotal();
   });
 }
 
-function salvarPedido(pedido){
-  let h = JSON.parse(localStorage.getItem("pedidos")) || [];
-  h.unshift(pedido);
-  localStorage.setItem("pedidos", JSON.stringify(h));
+function salvarPedido(p){
+  let h=JSON.parse(localStorage.getItem("pedidos"))||[];
+  h.unshift(p);
+  localStorage.setItem("pedidos",JSON.stringify(h));
 }
 
 function carregarHistorico(){
-  const h = JSON.parse(localStorage.getItem("pedidos")) || [];
-  const div = document.getElementById("historico");
-  div.innerHTML = h.length ? "" : "<p>Nenhum pedido ainda.</p>";
-
+  const h=JSON.parse(localStorage.getItem("pedidos"))||[];
+  const d=document.getElementById("historico");
+  d.innerHTML=h.length?"":"Nenhum pedido";
   h.forEach(p=>{
-    div.innerHTML += `
-      <div style="background:#111;padding:10px;border-radius:8px;margin-bottom:10px;">
-        <strong>${p.data}</strong><br>
-        💰 R$ ${p.total}<br>
-        📍 ${p.endereco}
-      </div>`;
+    d.innerHTML+=`<p>🕒 ${p.data} — 💰 R$ ${p.total}</p>`;
   });
 }
 
@@ -220,20 +188,15 @@ function limparHistorico(){
 }
 
 function finalizarPedido(){
-  const subtotal = produto.value * quantidade.value;
-  const totalFinal = (subtotal + taxaEntrega).toFixed(2);
-
-  const pedido = {
-    data: new Date().toLocaleString(),
-    total: totalFinal,
-    endereco: endereco.value
+  const totalFinal=(produto.value*quantidade.value).toFixed(2);
+  const pedido={
+    data:new Date().toLocaleString(),
+    total:totalFinal
   };
-
   salvarPedido(pedido);
   carregarHistorico();
 
-  const msg =
-`🍢 Pedido Espetinho Nota 10
+  const msg=`Pedido Espetinho Nota 10
 Nome: ${nome.value}
 Produto: ${produto.options[produto.selectedIndex].text}
 Qtd: ${quantidade.value}
@@ -245,6 +208,10 @@ Localização: ${localizacao.value}`;
 }
 
 carregarHistorico();
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("service-worker.js");
+}
 </script>
 
 </body>
