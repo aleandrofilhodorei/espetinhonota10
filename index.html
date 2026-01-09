@@ -25,7 +25,7 @@ header{
   border-bottom:4px solid #ff9800;
 }
 header h1{margin:0;color:#ff9800;font-size:36px}
-section{
+section,.card{
   max-width:900px;
   margin:30px auto;
   padding:25px;
@@ -73,12 +73,10 @@ input,textarea,select{
   border-radius:50%;
   text-decoration:none;
 }
-.card{
-  max-width:900px;
-  margin:30px auto;
-  padding:20px;
-  background:#111;
-  border-radius:10px;
+.status{
+  font-size:18px;
+  font-weight:bold;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -91,33 +89,35 @@ input,textarea,select{
 </header>
 
 <section>
+<h2>🕒 Funcionamento & Entrega</h2>
+<p><strong>Dias:</strong> Sexta, Sábado e Domingo</p>
+<p><strong>Horário:</strong> 19:00 às 23:00</p>
+<p id="statusHoje" class="status">Verificando...</p>
+<p id="statusEntrega"></p>
+</section>
+
+<section>
 <h2>🍢 Cardápio</h2>
 <div class="item"><span>Gado simples</span><strong>R$ 15</strong></div>
 <div class="item"><span>Gado completo</span><strong>R$ 20</strong></div>
-<div class="item"><span>Misto-Gado-Lingiça</span><strong>R$ 25</strong></div>
+<div class="item"><span>Misto-Gado-Linguiça</span><strong>R$ 25</strong></div>
 </section>
 
 <section>
 <h2>📝 Fazer pedido</h2>
 
 <input id="nome" placeholder="Nome">
-
 <select id="produto">
 <option value="15">Gado simples - R$15</option>
 <option value="20">Gado completo - R$20</option>
 <option value="25">Misto-Gado-Linguiça - R$25</option>
 </select>
-
 <input type="number" id="quantidade" value="1" min="1">
-
 <textarea id="endereco" placeholder="Endereço"></textarea>
-
 <input id="localizacao" readonly placeholder="Localização GPS">
 
 <button class="botao" onclick="pegarLocalizacao()">📍 Usar minha localização</button>
-
 <p id="total"><strong>Total: R$ 15,00</strong></p>
-
 <button class="botao" onclick="finalizarPedido()">Finalizar Pedido</button>
 </section>
 
@@ -126,7 +126,6 @@ input,textarea,select{
 <p>📱 Chave Pix: <strong>55 99 98477-2668</strong></p>
 <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=PIX-5599984772668"
 style="display:block;margin:auto;border-radius:10px">
-<p style="text-align:center;">Após pagar, envie o comprovante</p>
 </section>
 
 <div class="card">
@@ -145,25 +144,41 @@ style="display:block;margin:auto;border-radius:10px">
 const produto=document.getElementById("produto");
 const quantidade=document.getElementById("quantidade");
 const total=document.getElementById("total");
-let taxaEntrega=0;
-
-const LOJA_LAT=-5.5266;
-const LOJA_LON=-47.4821;
 
 function atualizarTotal(){
-  const sub=produto.value*quantidade.value;
-  total.innerText=`Total: R$ ${(sub+taxaEntrega).toFixed(2)}`;
+  total.innerText=`Total: R$ ${(produto.value*quantidade.value).toFixed(2)}`;
 }
 produto.onchange=atualizarTotal;
 quantidade.oninput=atualizarTotal;
 
+function verificarFuncionamento(){
+  const agora=new Date();
+  const dia=agora.getDay();
+  const hora=agora.getHours()+agora.getMinutes()/60;
+  const dias=[5,6,0];
+  const abertoHoje=dias.includes(dia);
+  const abertoAgora=abertoHoje && hora>=19 && hora<23;
+
+  const s=document.getElementById("statusHoje");
+  const e=document.getElementById("statusEntrega");
+
+  if(abertoAgora){
+    s.innerHTML="🟢 <span style='color:#25d366'>ABERTO AGORA</span>";
+    e.innerHTML="🛵 Entregas funcionando";
+  }else if(abertoHoje){
+    s.innerHTML="🟡 <span style='color:#ff9800'>ABERTO HOJE</span>";
+    e.innerHTML="⏰ Entregas a partir das 19:00";
+  }else{
+    s.innerHTML="🔴 <span style='color:#ff5252'>FECHADO HOJE</span>";
+    e.innerHTML="❌ Sem entregas hoje";
+  }
+  return abertoAgora;
+}
+
 function pegarLocalizacao(){
   navigator.geolocation.getCurrentPosition(pos=>{
-    const lat=pos.coords.latitude;
-    const lon=pos.coords.longitude;
     document.getElementById("localizacao").value=
-      `https://www.google.com/maps?q=${lat},${lon}`;
-    atualizarTotal();
+      `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
   });
 }
 
@@ -188,12 +203,13 @@ function limparHistorico(){
 }
 
 function finalizarPedido(){
+  if(!verificarFuncionamento()){
+    alert("❌ Estamos fechados agora.\nFuncionamos sexta a domingo das 19h às 23h.");
+    return;
+  }
+
   const totalFinal=(produto.value*quantidade.value).toFixed(2);
-  const pedido={
-    data:new Date().toLocaleString(),
-    total:totalFinal
-  };
-  salvarPedido(pedido);
+  salvarPedido({data:new Date().toLocaleString(),total:totalFinal});
   carregarHistorico();
 
   const msg=`Pedido Espetinho Nota 10
@@ -208,10 +224,8 @@ Localização: ${localizacao.value}`;
 }
 
 carregarHistorico();
-
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("service-worker.js");
-}
+verificarFuncionamento();
+setInterval(verificarFuncionamento,60000);
 </script>
 
 </body>
