@@ -210,6 +210,37 @@ function finalizarPedido() {
   );
 }
 </script>
+  <label>📍 Localização:</label><br>
+<input type="text" id="localizacao" placeholder="Clique para usar sua localização" readonly>
+<br><br>
+
+<button type="button" class="botao" onclick="pegarLocalizacao()">
+  📍 Usar minha localização
+</button>
+  <script>
+function pegarLocalizacao() {
+  if (!navigator.geolocation) {
+    alert("Geolocalização não é suportada neste navegador.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function (position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      const linkMapa = `https://www.google.com/maps?q=${lat},${lon}`;
+
+      document.getElementById("localizacao").value = linkMapa;
+    },
+    function () {
+      alert("Não foi possível obter a localização.");
+    }
+  );
+}
+</script>
+
+
 
 <section>
 <h2>📍 Onde estamos</h2>
