@@ -178,6 +178,37 @@ target="_blank">💬</a>
   </button>
 </form>
 </section>
+<section>
+  <h2>📝 Fazer pedido pelo site</h2>
+
+  <form id="pedidoForm">
+
+    <label>👤 Nome:</label><br>
+    <input type="text" id="nome" required><br><br>
+
+    <label>🍢 Escolha o espetinho:</label><br>
+    <select id="produto">
+      <option value="15">Carne - R$15</option>
+      <option value="15">Frango - R$15</option>
+      <option value="25">Misto - R$25</option>
+    </select><br><br>
+
+    <label>🔢 Quantidade:</label><br>
+    <input type="number" id="quantidade" min="1" value="1"><br><br>
+
+    <label>📍 Endereço:</label><br>
+    <textarea id="endereco" required></textarea><br><br>
+
+    <p id="total" style="font-weight:bold; font-size:18px;">
+      Total: R$ 15,00
+    </p>
+
+    <button type="button" class="botao" onclick="finalizarPedido()">
+      Finalizar Pedido
+    </button>
+
+  </form>
+</section>
 
 
 </body>
