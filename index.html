@@ -233,8 +233,10 @@ function pegarLocalizacao() {
 
       document.getElementById("localizacao").value = linkMapa;
     },
-    function () {
-      alert("Não foi possível obter a localização.");
+    function (const localizacao = document.getElementById("localizacao").value || "Não informada";
+) {
+      alert("`📍 Localização: ${localizacao}%0A` +
+");
     }
   );
 }
