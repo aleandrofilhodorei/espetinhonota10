@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Pedidos</title>
+<style>
+body{font-family:Arial;background:#111;color:white;padding:20px}
+.card{
+  background:#1f1f1f;
+  padding:15px;
+  margin-bottom:10px;
+  border-left:5px solid #ff9800;
+}
+button{
+  padding:10px;
+  background:#ff9800;
+  border:none;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h1>📊 Painel de Pedidos</h1>
+<div id="lista"></div>
+<button onclick="limpar()">Limpar tudo</button>
+
+<script>
+function carregar(){
+  const pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+  const lista=document.getElementById("lista");
+  lista.innerHTML="";
+  pedidos.forEach(p=>{
+    lista.innerHTML+=`
+      <div class="card">
+        <strong>${p.nome}</strong><br>
+        ${p.produto}<br>
+        Qtd: ${p.qtd}<br>
+        Total: R$ ${p.total}<br>
+        Pagamento: ${p.pagamento}<br>
+        🕒 ${p.data}
+      </div>`;
+  });
+}
+function limpar(){
+  localStorage.removeItem("pedidos");
+  carregar();
+}
+carregar();
+</script>
+
+</body>
+</html>
