@@ -23,7 +23,7 @@ header{
   border-bottom:4px solid #ff9800;
 }
 header h1{margin:0;color:#ff9800;font-size:36px}
-section,.card{
+section{
   max-width:900px;
   margin:30px auto;
   padding:25px;
@@ -45,6 +45,7 @@ input,textarea,select{
   padding:10px;
   border-radius:6px;
   border:none;
+  margin-top:8px;
 }
 .botao{
   display:block;
@@ -76,6 +77,13 @@ input,textarea,select{
   font-weight:bold;
   margin-top:10px;
 }
+#pixBox{
+  display:none;
+  background:#111;
+  padding:10px;
+  border-radius:6px;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -94,7 +102,6 @@ input,textarea,select{
 <p id="statusHoje" class="status">Verificando...</p>
 <p id="statusEntrega"></p>
 
-<!-- BOTÃO MANUAL (VOCÊ CONTROLA) -->
 <button class="botao" onclick="alternarManual()">
 🔘 Abrir / Fechar Manualmente
 </button>
@@ -104,24 +111,41 @@ input,textarea,select{
 <h2>🍢 Cardápio</h2>
 <div class="item"><span>Gado simples</span><strong>R$ 15</strong></div>
 <div class="item"><span>Gado completo</span><strong>R$ 20</strong></div>
-<div class="item"><span>Misto-Gado-Linguiça</span><strong>R$ 25</strong></div>
+<div class="item"><span>Misto Gado + Linguiça</span><strong>R$ 25</strong></div>
 </section>
 
 <section>
 <h2>📝 Fazer pedido</h2>
 
 <input id="nome" placeholder="Nome">
+
 <select id="produto">
 <option value="15">Gado simples - R$15</option>
 <option value="20">Gado completo - R$20</option>
-<option value="25">Misto-Gado-Linguiça - R$25</option>
+<option value="25">Misto Gado + Linguiça - R$25</option>
 </select>
-<input type="number" id="quantidade" value="1" min="1">
-<textarea id="endereco" placeholder="Endereço"></textarea>
-<input id="localizacao" readonly placeholder="Localização GPS">
 
+<input type="number" id="quantidade" value="1" min="1">
+
+<textarea id="endereco" placeholder="Endereço"></textarea>
+
+<input id="localizacao" readonly placeholder="Localização GPS">
 <button class="botao" onclick="pegarLocalizacao()">📍 Usar minha localização</button>
+
+<h3>💰 Forma de pagamento</h3>
+<select id="pagamento" onchange="mostrarPix()">
+<option value="Dinheiro">💵 Dinheiro</option>
+<option value="Pix">📲 PIX</option>
+</select>
+
+<div id="pixBox">
+<p><strong>Chave PIX:</strong></p>
+<p>📱 <strong>99984772668</strong></p>
+<p style="font-size:14px;color:#ff9800;">Envie o comprovante no WhatsApp</p>
+</div>
+
 <p id="total"><strong>Total: R$ 15,00</strong></p>
+
 <button class="botao" onclick="finalizarPedido()">Finalizar Pedido</button>
 </section>
 
@@ -145,8 +169,8 @@ produto.onchange=atualizarTotal;
 quantidade.oninput=atualizarTotal;
 
 function alternarManual(){
-  abertoManual = !abertoManual;
-  localStorage.setItem("abertoManual", abertoManual);
+  abertoManual=!abertoManual;
+  localStorage.setItem("abertoManual",abertoManual);
   verificarFuncionamento();
 }
 
@@ -154,10 +178,7 @@ function verificarFuncionamento(){
   const agora=new Date();
   const dia=agora.getDay();
   const hora=agora.getHours()+agora.getMinutes()/60;
-
-  const dias=[3,4,5,6,0]; // quarta a domingo
-  const abertoHoje=dias.includes(dia);
-  const abertoAgora=abertoHoje && hora>=19 && hora<23;
+  const dias=[3,4,5,6,0];
 
   const s=document.getElementById("statusHoje");
   const e=document.getElementById("statusEntrega");
@@ -168,11 +189,11 @@ function verificarFuncionamento(){
     return true;
   }
 
-  if(abertoAgora){
+  if(dias.includes(dia) && hora>=19 && hora<23){
     s.innerHTML="🟢 ABERTO AGORA";
     e.innerHTML="🛵 Entregas funcionando";
     return true;
-  }else if(abertoHoje){
+  }else if(dias.includes(dia)){
     s.innerHTML="🟡 ABRE HOJE ÀS 19H";
     e.innerHTML="⏰ Aguarde o horário";
     return false;
@@ -183,9 +204,14 @@ function verificarFuncionamento(){
   }
 }
 
+function mostrarPix(){
+  document.getElementById("pixBox").style.display =
+    pagamento.value==="Pix"?"block":"none";
+}
+
 function pegarLocalizacao(){
   navigator.geolocation.getCurrentPosition(pos=>{
-    document.getElementById("localizacao").value=
+    localizacao.value=
       `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
   });
 }
@@ -198,13 +224,17 @@ function finalizarPedido(){
 
   const totalFinal=(produto.value*quantidade.value).toFixed(2);
 
-  const msg=`Pedido Espetinho Nota 10
-Nome: ${nome.value}
-Produto: ${produto.options[produto.selectedIndex].text}
-Qtd: ${quantidade.value}
-Total: R$ ${totalFinal}
-Endereço: ${endereco.value}
-Localização: ${localizacao.value}`;
+  const msg=`🍢 Pedido Espetinho Nota 10
+👤 Nome: ${nome.value}
+🍽️ Produto: ${produto.options[produto.selectedIndex].text}
+📦 Quantidade: ${quantidade.value}
+💰 Total: R$ ${totalFinal}
+💳 Pagamento: ${pagamento.value}
+
+📍 Endereço: ${endereco.value}
+🗺️ Localização: ${localizacao.value}
+
+${pagamento.value==="Pix"?"📲 PIX: 99984772668":""}`;
 
   window.open("https://wa.me/5599984772668?text="+encodeURIComponent(msg));
 }
