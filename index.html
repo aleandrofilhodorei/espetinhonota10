@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espetinho Nota 10</title>
 
-<link rel="manifest" href="manifest.json">
-
 <style>
 body{
   margin:0;
@@ -90,10 +88,16 @@ input,textarea,select{
 
 <section>
 <h2>🕒 Funcionamento & Entrega</h2>
-<p><strong>Dias:</strong> Sexta, Sábado e Domingo</p>
+<p><strong>Dias:</strong> Quarta a Domingo</p>
 <p><strong>Horário:</strong> 19:00 às 23:00</p>
+
 <p id="statusHoje" class="status">Verificando...</p>
 <p id="statusEntrega"></p>
+
+<!-- BOTÃO MANUAL (VOCÊ CONTROLA) -->
+<button class="botao" onclick="alternarManual()">
+🔘 Abrir / Fechar Manualmente
+</button>
 </section>
 
 <section>
@@ -121,19 +125,6 @@ input,textarea,select{
 <button class="botao" onclick="finalizarPedido()">Finalizar Pedido</button>
 </section>
 
-<section>
-<h2>💰 Pagamento PIX</h2>
-<p>📱 Chave Pix: <strong>55 99 98477-2668</strong></p>
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=PIX-5599984772668"
-style="display:block;margin:auto;border-radius:10px">
-</section>
-
-<div class="card">
-<h2>📜 Histórico de pedidos</h2>
-<div id="historico"></div>
-<button class="botao" onclick="limparHistorico()">Limpar histórico</button>
-</div>
-
 <footer style="text-align:center;padding:20px;background:#000;">
 © 2026 - Espetinho Nota 10
 </footer>
@@ -145,34 +136,51 @@ const produto=document.getElementById("produto");
 const quantidade=document.getElementById("quantidade");
 const total=document.getElementById("total");
 
+let abertoManual = localStorage.getItem("abertoManual") === "true";
+
 function atualizarTotal(){
   total.innerText=`Total: R$ ${(produto.value*quantidade.value).toFixed(2)}`;
 }
 produto.onchange=atualizarTotal;
 quantidade.oninput=atualizarTotal;
 
+function alternarManual(){
+  abertoManual = !abertoManual;
+  localStorage.setItem("abertoManual", abertoManual);
+  verificarFuncionamento();
+}
+
 function verificarFuncionamento(){
   const agora=new Date();
   const dia=agora.getDay();
   const hora=agora.getHours()+agora.getMinutes()/60;
-  const dias=[5,6,0];
+
+  const dias=[3,4,5,6,0]; // quarta a domingo
   const abertoHoje=dias.includes(dia);
   const abertoAgora=abertoHoje && hora>=19 && hora<23;
 
   const s=document.getElementById("statusHoje");
   const e=document.getElementById("statusEntrega");
 
-  if(abertoAgora){
-    s.innerHTML="🟢 <span style='color:#25d366'>ABERTO AGORA</span>";
-    e.innerHTML="🛵 Entregas funcionando";
-  }else if(abertoHoje){
-    s.innerHTML="🟡 <span style='color:#ff9800'>ABERTO HOJE</span>";
-    e.innerHTML="⏰ Entregas a partir das 19:00";
-  }else{
-    s.innerHTML="🔴 <span style='color:#ff5252'>FECHADO HOJE</span>";
-    e.innerHTML="❌ Sem entregas hoje";
+  if(abertoManual){
+    s.innerHTML="🟢 ABERTO (MANUAL)";
+    e.innerHTML="🛵 Entregas liberadas";
+    return true;
   }
-  return abertoAgora;
+
+  if(abertoAgora){
+    s.innerHTML="🟢 ABERTO AGORA";
+    e.innerHTML="🛵 Entregas funcionando";
+    return true;
+  }else if(abertoHoje){
+    s.innerHTML="🟡 ABRE HOJE ÀS 19H";
+    e.innerHTML="⏰ Aguarde o horário";
+    return false;
+  }else{
+    s.innerHTML="🔴 FECHADO HOJE";
+    e.innerHTML="❌ Sem entregas hoje";
+    return false;
+  }
 }
 
 function pegarLocalizacao(){
@@ -182,35 +190,13 @@ function pegarLocalizacao(){
   });
 }
 
-function salvarPedido(p){
-  let h=JSON.parse(localStorage.getItem("pedidos"))||[];
-  h.unshift(p);
-  localStorage.setItem("pedidos",JSON.stringify(h));
-}
-
-function carregarHistorico(){
-  const h=JSON.parse(localStorage.getItem("pedidos"))||[];
-  const d=document.getElementById("historico");
-  d.innerHTML=h.length?"":"Nenhum pedido";
-  h.forEach(p=>{
-    d.innerHTML+=`<p>🕒 ${p.data} — 💰 R$ ${p.total}</p>`;
-  });
-}
-
-function limparHistorico(){
-  localStorage.removeItem("pedidos");
-  carregarHistorico();
-}
-
 function finalizarPedido(){
   if(!verificarFuncionamento()){
-    alert("❌ Estamos fechados agora.\nFuncionamos sexta a domingo das 19h às 23h.");
+    alert("❌ Estamos fechados no momento.");
     return;
   }
 
   const totalFinal=(produto.value*quantidade.value).toFixed(2);
-  salvarPedido({data:new Date().toLocaleString(),total:totalFinal});
-  carregarHistorico();
 
   const msg=`Pedido Espetinho Nota 10
 Nome: ${nome.value}
@@ -223,7 +209,6 @@ Localização: ${localizacao.value}`;
   window.open("https://wa.me/5599984772668?text="+encodeURIComponent(msg));
 }
 
-carregarHistorico();
 verificarFuncionamento();
 setInterval(verificarFuncionamento,60000);
 </script>
