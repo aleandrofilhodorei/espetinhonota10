@@ -5,84 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espetinho Nota 10</title>
 
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff9800">
+
 <style>
 body{
   margin:0;
   font-family:Arial, sans-serif;
   color:white;
-  background:
-    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
-    url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1");
+  background:linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.8)),
+  url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1");
   background-size:cover;
-  background-position:center;
 }
 header{
-  text-align:center;
-  padding:40px 20px;
   background:#000;
+  padding:30px;
+  text-align:center;
   border-bottom:4px solid #ff9800;
 }
-header h1{margin:0;color:#ff9800;font-size:36px}
 section{
   max-width:900px;
-  margin:30px auto;
-  padding:25px;
-  background:rgba(0,0,0,0.85);
+  margin:20px auto;
+  background:rgba(0,0,0,.85);
+  padding:20px;
   border-radius:10px;
 }
 h2{color:#ff9800}
-.item{
-  display:flex;
-  justify-content:space-between;
-  background:#1f1f1f;
-  padding:15px;
-  margin-top:10px;
-  border-left:5px solid #ff9800;
-  border-radius:8px;
-}
-input,textarea,select{
+input,select,textarea{
   width:100%;
   padding:10px;
+  margin-top:8px;
   border-radius:6px;
   border:none;
-  margin-top:8px;
 }
 .botao{
-  display:block;
-  margin:15px auto;
   background:#ff9800;
-  color:#000;
   padding:15px;
+  margin-top:15px;
   border-radius:8px;
   font-weight:bold;
   text-align:center;
   cursor:pointer;
 }
+.item{
+  display:flex;
+  justify-content:space-between;
+  background:#1f1f1f;
+  padding:12px;
+  margin-top:8px;
+  border-left:5px solid #ff9800;
+}
+#pixBox{display:none;text-align:center}
 .whatsapp{
   position:fixed;
   bottom:20px;
   right:20px;
+  background:#25d366;
   width:60px;
   height:60px;
-  background:#25d366;
-  color:white;
-  font-size:32px;
+  border-radius:50%;
+  font-size:30px;
   text-align:center;
   line-height:60px;
-  border-radius:50%;
+  color:white;
   text-decoration:none;
-}
-.status{
-  font-size:18px;
-  font-weight:bold;
-  margin-top:10px;
-}
-#pixBox{
-  display:none;
-  background:#111;
-  padding:10px;
-  border-radius:6px;
-  margin-top:10px;
 }
 </style>
 </head>
@@ -95,63 +82,40 @@ input,textarea,select{
 </header>
 
 <section>
-<h2>🕒 Funcionamento & Entrega</h2>
-<p><strong>Dias:</strong> Quarta a Domingo</p>
-<p><strong>Horário:</strong> 19:00 às 23:00</p>
-
-<p id="statusHoje" class="status">Verificando...</p>
-<p id="statusEntrega"></p>
-
-<button class="botao" onclick="alternarManual()">
-🔘 Abrir / Fechar Manualmente
-</button>
-</section>
-
-<section>
 <h2>🍢 Cardápio</h2>
-<div class="item"><span>Gado simples</span><strong>R$ 15</strong></div>
-<div class="item"><span>Gado completo</span><strong>R$ 20</strong></div>
-<div class="item"><span>Misto Gado + Linguiça</span><strong>R$ 25</strong></div>
+<div class="item"><span>Gado simples</span><strong>R$15</strong></div>
+<div class="item"><span>Gado completo</span><strong>R$20</strong></div>
+<div class="item"><span>Misto Gado + Linguiça</span><strong>R$25</strong></div>
 </section>
 
 <section>
-<h2>📝 Fazer pedido</h2>
+<h2>📝 Pedido</h2>
 
 <input id="nome" placeholder="Nome">
-
 <select id="produto">
 <option value="15">Gado simples - R$15</option>
 <option value="20">Gado completo - R$20</option>
-<option value="25">Misto Gado + Linguiça - R$25</option>
+<option value="25">Misto - R$25</option>
 </select>
 
 <input type="number" id="quantidade" value="1" min="1">
-
 <textarea id="endereco" placeholder="Endereço"></textarea>
 
-<input id="localizacao" readonly placeholder="Localização GPS">
-<button class="botao" onclick="pegarLocalizacao()">📍 Usar minha localização</button>
-
-<h3>💰 Forma de pagamento</h3>
+<h3>💰 Pagamento</h3>
 <select id="pagamento" onchange="mostrarPix()">
-<option value="Dinheiro">💵 Dinheiro</option>
-<option value="Pix">📲 PIX</option>
+<option>Dinheiro</option>
+<option>Pix</option>
 </select>
 
 <div id="pixBox">
-<p><strong>Chave PIX:</strong></p>
-<p>📱 <strong>99984772668</strong></p>
-<p style="font-size:14px;color:#ff9800;">Envie o comprovante no WhatsApp</p>
+<p><strong>PIX: 99984772668</strong></p>
+<img id="qrPix" width="200">
+<p>Envie o comprovante</p>
 </div>
 
-<p id="total"><strong>Total: R$ 15,00</strong></p>
-
-<button class="botao" onclick="finalizarPedido()">Finalizar Pedido</button>
+<p id="total"><strong>Total: R$15,00</strong></p>
+<div class="botao" onclick="finalizarPedido()">Finalizar Pedido</div>
 </section>
-
-<footer style="text-align:center;padding:20px;background:#000;">
-© 2026 - Espetinho Nota 10
-</footer>
 
 <a class="whatsapp" href="https://wa.me/5599984772668" target="_blank">💬</a>
 
@@ -160,87 +124,52 @@ const produto=document.getElementById("produto");
 const quantidade=document.getElementById("quantidade");
 const total=document.getElementById("total");
 
-let abertoManual = localStorage.getItem("abertoManual") === "true";
-
 function atualizarTotal(){
-  total.innerText=`Total: R$ ${(produto.value*quantidade.value).toFixed(2)}`;
+  total.innerHTML=`<strong>Total: R$ ${(produto.value*quantidade.value).toFixed(2)}</strong>`;
 }
 produto.onchange=atualizarTotal;
 quantidade.oninput=atualizarTotal;
 
-function alternarManual(){
-  abertoManual=!abertoManual;
-  localStorage.setItem("abertoManual",abertoManual);
-  verificarFuncionamento();
-}
-
-function verificarFuncionamento(){
-  const agora=new Date();
-  const dia=agora.getDay();
-  const hora=agora.getHours()+agora.getMinutes()/60;
-  const dias=[3,4,5,6,0];
-
-  const s=document.getElementById("statusHoje");
-  const e=document.getElementById("statusEntrega");
-
-  if(abertoManual){
-    s.innerHTML="🟢 ABERTO (MANUAL)";
-    e.innerHTML="🛵 Entregas liberadas";
-    return true;
-  }
-
-  if(dias.includes(dia) && hora>=19 && hora<23){
-    s.innerHTML="🟢 ABERTO AGORA";
-    e.innerHTML="🛵 Entregas funcionando";
-    return true;
-  }else if(dias.includes(dia)){
-    s.innerHTML="🟡 ABRE HOJE ÀS 19H";
-    e.innerHTML="⏰ Aguarde o horário";
-    return false;
-  }else{
-    s.innerHTML="🔴 FECHADO HOJE";
-    e.innerHTML="❌ Sem entregas hoje";
-    return false;
-  }
-}
-
 function mostrarPix(){
-  document.getElementById("pixBox").style.display =
-    pagamento.value==="Pix"?"block":"none";
+  const pix=document.getElementById("pixBox");
+  if(pagamento.value==="Pix"){
+    pix.style.display="block";
+    const valor=(produto.value*quantidade.value).toFixed(2);
+    document.getElementById("qrPix").src=
+      `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=PIX 99984772668 VALOR ${valor}`;
+  }else pix.style.display="none";
 }
 
-function pegarLocalizacao(){
-  navigator.geolocation.getCurrentPosition(pos=>{
-    localizacao.value=
-      `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
-  });
+function salvarPedido(p){
+  let pedidos=JSON.parse(localStorage.getItem("pedidos"))||[];
+  pedidos.unshift(p);
+  localStorage.setItem("pedidos",JSON.stringify(pedidos));
 }
 
 function finalizarPedido(){
-  if(!verificarFuncionamento()){
-    alert("❌ Estamos fechados no momento.");
-    return;
-  }
-
   const totalFinal=(produto.value*quantidade.value).toFixed(2);
 
+  const pedido={
+    data:new Date().toLocaleString(),
+    nome:nome.value,
+    produto:produto.options[produto.selectedIndex].text,
+    qtd:quantidade.value,
+    total:totalFinal,
+    pagamento:pagamento.value
+  };
+
+  salvarPedido(pedido);
+
   const msg=`🍢 Pedido Espetinho Nota 10
-👤 Nome: ${nome.value}
-🍽️ Produto: ${produto.options[produto.selectedIndex].text}
-📦 Quantidade: ${quantidade.value}
-💰 Total: R$ ${totalFinal}
-💳 Pagamento: ${pagamento.value}
-
-📍 Endereço: ${endereco.value}
-🗺️ Localização: ${localizacao.value}
-
-${pagamento.value==="Pix"?"📲 PIX: 99984772668":""}`;
+Nome: ${pedido.nome}
+Produto: ${pedido.produto}
+Qtd: ${pedido.qtd}
+Total: R$ ${pedido.total}
+Pagamento: ${pedido.pagamento}
+Endereço: ${endereco.value}`;
 
   window.open("https://wa.me/5599984772668?text="+encodeURIComponent(msg));
 }
-
-verificarFuncionamento();
-setInterval(verificarFuncionamento,60000);
 </script>
 
 </body>
